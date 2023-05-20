@@ -39,7 +39,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result)
       console.log(result);
-     
+
     })
 
     app.get('/toys/:id', async (req, res) => {
@@ -51,13 +51,21 @@ async function run() {
     })
 
     app.get('/mytoys/', async (req, res) => {
-      let query ={}
-      if(req.query?.email){
-        query ={email : req.query.email}
+      let query = {}
+      if (req.query?.email) {
+        query = { email: req.query.email }
       }
       const result = await toyCollection.find(query).toArray();
       res.send(result);
-      
+
+    })
+
+    app.delete('/toys/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) }
+      const result = await toyCollection.deleteOne(query)
+      res.send(result)
     })
 
     // Send a ping to confirm a successful connection
