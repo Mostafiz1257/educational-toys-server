@@ -35,7 +35,7 @@ async function run() {
 
     })
     app.get('/toys', async (req, res) => {
-      const cursor = toyCollection.find()
+      const cursor = toyCollection.find().limit(20)
       const result = await cursor.toArray();
       res.send(result)
       console.log(result);
@@ -50,7 +50,7 @@ async function run() {
       res.send(result)
     })
 
-    app.get('/mytoys/', async (req, res) => {
+    app.get('/mytoys', async (req, res) => {
       let query = {}
       if (req.query?.email) {
         query = { email: req.query.email }
@@ -58,6 +58,22 @@ async function run() {
       const result = await toyCollection.find(query).toArray();
       res.send(result);
 
+    })
+
+    app.put('/mytoys/:id',async(req,res)=>{
+      const id = req.params.id;
+      const selectToys = req.body;
+      const filter = {_id : new ObjectId(id)}
+      const options ={upset:true}
+      const updateToys ={
+        $set:{
+          price:selectToys.price,
+          quantity : selectToys.quantity,
+          details:selectToys.details
+        }
+      }
+      const result = await toyCollection.updateOne(filter,updateToys)
+      res.send(result)
     })
 
     app.delete('/toys/:id', async (req, res) => {
