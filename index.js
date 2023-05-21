@@ -6,7 +6,14 @@ const port = process.env.PORT || 5000
 const app = express();
 
 //middleware
-app.use(cors())
+// app.use(cors());
+const corsOptions ={
+  origin:'*', 
+  credentials:true,
+  optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions))
 app.use(express.json())
 
 
@@ -64,6 +71,7 @@ async function run() {
 
     app.put('/mytoys/:id',async(req,res)=>{
       const id = req.params.id;
+      console.log(id);
       const selectToys = req.body;
       body.createdAt = new Date();
       const filter = {_id : new ObjectId(id)}
