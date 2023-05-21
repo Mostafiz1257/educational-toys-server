@@ -37,7 +37,7 @@ async function run() {
 
     })
     app.get('/toys', async (req, res) => {
-      const cursor = toyCollection.find().limit(20)
+      const cursor = toyCollection.find().sort({createdAt:-1}).limit(20)
       const result = await cursor.toArray();
       res.send(result)
       console.log(result);
@@ -65,6 +65,7 @@ async function run() {
     app.put('/mytoys/:id',async(req,res)=>{
       const id = req.params.id;
       const selectToys = req.body;
+      body.createdAt = new Date();
       const filter = {_id : new ObjectId(id)}
       const options ={upset:true}
       const updateToys ={
@@ -85,6 +86,12 @@ async function run() {
       const result = await toyCollection.deleteOne(query)
       res.send(result)
     })
+
+//get by sub-category
+app.get('/category/:sub_category',async(req,res)=>{
+  const toys = await toyCollection.find({sub_category: req.params.sub_category}).toArray()
+  res.send(toys)
+})
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
