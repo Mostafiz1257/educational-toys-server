@@ -4,9 +4,11 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000
 const app = express();
+//chatGTP
+// const { createProxyMiddleware } = require('http-proxy-middleware');
+
 
 //middleware
-// app.use(cors());
 const corsOptions ={
   origin:'*', 
   credentials:true,
@@ -14,10 +16,16 @@ const corsOptions ={
 }
 
 app.use(cors(corsOptions))
-app.use(express.json())
+
+// app.use(function(req, res, next) {
+//    res.header("Access-Control-Allow-Origin", "*");
+//    res.header('Access-Control-Allow-Methods', 'DELETE, PUT, GET, POST,PATCH');
+//    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//    next();
+// });
+// app.use(express.json())
 
 
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.esni35a.mongodb.net/?retryWrites=true&w=majority`;
 
 var uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ac-848jnr6-shard-00-00.esni35a.mongodb.net:27017,ac-848jnr6-shard-00-01.esni35a.mongodb.net:27017,ac-848jnr6-shard-00-02.esni35a.mongodb.net:27017/?ssl=true&replicaSet=atlas-bmxs0j-shard-0&authSource=admin&retryWrites=true&w=majority`;
 
@@ -73,9 +81,9 @@ async function run() {
       const id = req.params.id;
       console.log(id);
       const selectToys = req.body;
-      body.createdAt = new Date();
+      // body.createdAt = new Date();
       const filter = {_id : new ObjectId(id)}
-      const options ={upset:true}
+      const options ={upsert:true}
       const updateToys ={
         $set:{
           price:selectToys.price,
@@ -83,7 +91,7 @@ async function run() {
           details:selectToys.details
         }
       }
-      const result = await toyCollection.updateOne(filter,updateToys)
+      const result = await toyCollection.updateOne(filter,updateToys,options)
       res.send(result)
     })
 
@@ -100,6 +108,18 @@ app.get('/category/:sub_category',async(req,res)=>{
   const toys = await toyCollection.find({sub_category: req.params.sub_category}).toArray()
   res.send(toys)
 })
+
+
+
+app.get("/getToysByText", async (req, res) => {
+  console.log(req.query.name);
+  let query = {};
+  if (req.query?.name) {
+    query = { name: req.query.name };
+  }
+  const result = await toyCollection.find(query).toArray();
+  res.send(result);
+});
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
